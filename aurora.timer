@@ -1,0 +1,9 @@
+[Unit]
+Description=Run Aurora package counter every 10 minutes
+
+[Timer]
+OnBootSec=0s
+OnUnitActiveSec=600s
+
+[Install]
+WantedBy=timers.target
