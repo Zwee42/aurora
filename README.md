@@ -19,19 +19,10 @@ Aurora consists of two parts:
   A systemd service + timer that periodically checks for available package updates and stores the result.
 ## Installation
 1. Place the Aurora folder in a fixed location (e.g. ~/Aurora).
-2. Edit aurora.service file and set User to your username:
+2. Simply run the aurora installer
 ```bash
-/home/[User]/Aurora/daemon.py
+python installer.py
 ```
-3. Run Aurora once:
-```bash
-python Aurora.py
-```
-On first run, Aurora will:
-- install its systemd service and timer
-- reload systemd
-- enable and start the timer automatically
-
 No manual systemd commands are required.
 ## License
 GNU General Public License v3
