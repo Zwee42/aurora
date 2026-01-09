@@ -1,11 +1,10 @@
 from time import sleep
 import sys
 import random
-import re
 from pathlib import Path
 from datetime import datetime
 import getpass
-import subprocess
+
 
 
 user = getpass.getuser()
@@ -45,6 +44,7 @@ def write(message):
 def terminal(msg):
     ts = datetime.now().strftime("%H:%M:%S")
     print(f"({ts}) {msg}")
+    sleep(0.4)
 
 def bash():
     with open(f"/home/{user}/.bashrc", "a") as f:
