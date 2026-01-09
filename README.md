@@ -19,7 +19,8 @@ Aurora consists of two parts:
   A systemd service + timer that periodically checks for available package updates and stores the result.
 ## Installation
 1. Place the Aurora folder in a fixed location (e.g. ~/Aurora).
-2. Simply run the aurora installer
+2. Edit aurora config file as desired
+3. Simply run the aurora installer
 ```bash
 python installer.py
 ```
