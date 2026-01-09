@@ -4,107 +4,230 @@ from functions import say, write, terminal, bash
 from pathlib import Path
 from time import sleep
 import random
+from config import fast_install, install_shell_hook
+from daemon import check_updates
 
-say(greeting)
+### Definitions ###
+MAX_TRIES = 3
 
-say("Alright. Let’s set this up properly before you hurt yourself.")
-# creating the aurora.service file
-with open("./aurora.service", "w") as f:
-    terminal("creating aurora.service...")
-    sleep(random.uniform(0.5, 5))
-    f.write(service)
-    terminal("aurora.service created.")
-# Creating the aurora.timer file
-with open("./aurora.timer", "w") as f:
-    terminal("creating aurora.timer...")
-    sleep(random.uniform(0.5, 5))
-    f.write(timer)
-    terminal("aurora.timer created.")
+servicePath = Path("/etc/systemd/system/aurora.service")
+timerPath = Path("/etc/systemd/system/aurora.timer")
+logPath = Path("/tmp/aurora.log")
 
-say("Service and timer files are ready. Try to keep up.")
+if not fast_install:
+    say(greeting)
 
-service = Path("/etc/systemd/system/aurora.service")
-timer = Path("/etc/systemd/system/aurora.timer")
-
-
-# Checking for existing service and timer files and removing them if they exist
-if service.exists():
-    say("Existing service detected. I’ll clean that up.")
-    say("This might ask for your password. Depends on how recently you proved you’re allowed to do things.")
-    write("sudo rm /etc/systemd/system/aurora.service")
-    try:
-        terminal("removing existing aurora.service...")
-        subprocess.run(["sudo", "rm", "/etc/systemd/system/aurora.service"])
+    say("Alright. Let’s set this up properly before you hurt yourself.")
+    # creating the aurora.service file
+    with open("./aurora.service", "w") as f:
+        terminal("creating aurora.service...")
         sleep(random.uniform(0.5, 5))
-        terminal("aurora.service removed.")
-    except Exception as err:
-        terminal("Task failed.")
-        terminal(f"Error: {err}")
-
-if timer.exists():
-    say("Existing timer detected. Same fate.")
-    write("sudo rm /etc/systemd/system/aurora.timer")
-    try:
-        terminal("removing existing aurora.timer...")
-        subprocess.run(["sudo", "rm", "/etc/systemd/system/aurora.timer"])
+        f.write(service)
+        terminal("aurora.service created.")
+    # Creating the aurora.timer file
+    with open("./aurora.timer", "w") as f:
+        terminal("creating aurora.timer...")
         sleep(random.uniform(0.5, 5))
-        terminal("aurora.timer removed.")
-    except Exception as err:
-        terminal("Task failed.")
-        terminal(f"Error: {err}")
+        f.write(timer)
+        terminal("aurora.timer created.")
 
-say("Old files cleared. As expected.")
+    say("Service and timer files are ready. Try to keep up.")
 
-base_dir = Path(__file__).resolve().parent
+    
 
-say("Now we put the new pieces where they belong.")
 
-if not service.exists() or not timer.exists():
-    say("Installing systemd service.")
-    write(f"sudo ln -s {base_dir}/aurora.service /etc/systemd/system/")
-    terminal("installing aurora.service...")
-    sleep(random.uniform(0.5, 5))
-    try:
-        subprocess.run(["sudo", "ln", "-s", f"{base_dir}/aurora.service", "/etc/systemd/system/"])
-        terminal("aurora.service installed.")
-    except Exception as err:
-        terminal("Installation failed.")
-        terminal(f"Error: {err}")
+    # Checking for existing service and timer files and removing them if they exist
+    if servicePath.exists():
+        say("Existing service detected. I’ll clean that up.")
+        say("This might ask for your password. Depends on how recently you proved you’re allowed to do things.")
+        write("sudo rm /etc/systemd/system/aurora.service")
+        try:
+            terminal("removing existing aurora.service...")
+            subprocess.run(["sudo", "rm", "/etc/systemd/system/aurora.service"])
+            sleep(random.uniform(0.5, 5))
+            terminal("aurora.service removed.")
+        except Exception as err:
+            terminal("Task failed.")
+            terminal(f"Error: {err}")
 
-    say("Installing systemd timer.")
-    write(f"sudo ln -s {base_dir}/aurora.timer /etc/systemd/system/")
-    terminal("installing aurora.timer...")
-    sleep(random.uniform(0.5, 5))
-    try:
-        subprocess.run(["sudo", "ln", "-s", f"{base_dir}/aurora.timer", "/etc/systemd/system/"])
-        terminal("aurora.timer installed.")
-    except Exception as err:
-        terminal("Installation failed.")
-        terminal(f"Error: {err}")
+    if timerPath.exists():
+        say("Existing timer detected. Same fate.")
+        write("sudo rm /etc/systemd/system/aurora.timer")
+        try:
+            terminal("removing existing aurora.timer...")
+            subprocess.run(["sudo", "rm", "/etc/systemd/system/aurora.timer"])
+            sleep(random.uniform(0.5, 5))
+            terminal("aurora.timer removed.")
+        except Exception as err:
+            terminal("Task failed.")
+            terminal(f"Error: {err}")
 
-    say("Refreshing systemd. It likes to be told when things change.")
-    say("I’ll need your password for this part. Don’t worry, I’m not interested in it.")
-    write("systemctl daemon-reload")
-    if subprocess.run(["systemctl", "daemon-reload"]).returncode != 0:
-        say("systemd did not cooperate.")
+    say("Old files cleared. As expected.")
 
-    say("Activating Aurora.")
-    say("Relax. If I wanted it, you’d never know.")
-    write("systemctl enable --now aurora.timer")
-    if subprocess.run(["systemctl", "enable", "--now", "aurora.timer"]).returncode != 0:
-        say("Activation failed.")
+    base_dir = Path(__file__).resolve().parent
 
-say("Good. Everything is running.")
+    say("Now we put the new pieces where they belong.")
 
-say("One last thing. Want Aurora available automatically in your terminal? (y/n)")
+    if not servicePath.exists() or not timerPath.exists():
+        say("Installing systemd service.")
+        write(f"sudo ln -s {base_dir}/aurora.service /etc/systemd/system/")
+        terminal("installing aurora.service...")
+        sleep(random.uniform(0.5, 5))
+        try:
+            subprocess.run(["sudo", "ln", "-s", f"{base_dir}/aurora.service", "/etc/systemd/system/"])
+            terminal("aurora.service installed.")
+        except Exception as err:
+            terminal("Installation failed.")
+            terminal(f"Error: {err}")
 
-valid_responses = ["y", "n"]
-while True:
-    inpt = input("> ").strip().lower()
-    if inpt in valid_responses:
-        if inpt == "y":
-            bash()
-        break
-    else:
-        say("Focus. It’s a yes or a no.")
-say("That’s it. I’m in place now. I’ll take it from here—try not to make my job harder.")
+        say("Installing systemd timer.")
+        write(f"sudo ln -s {base_dir}/aurora.timer /etc/systemd/system/")
+        terminal("installing aurora.timer...")
+        sleep(random.uniform(0.5, 5))
+        try:
+            subprocess.run(["sudo", "ln", "-s", f"{base_dir}/aurora.timer", "/etc/systemd/system/"])
+            terminal("aurora.timer installed.")
+        except Exception as err:
+            terminal("Installation failed.")
+            terminal(f"Error: {err}")
+
+        say("Refreshing systemd. It likes to be told when things change.")
+        say("I’ll need your password for this part. Don’t worry, I’m not interested in it.")
+        write("systemctl daemon-reload")
+        if subprocess.run(["systemctl", "daemon-reload"]).returncode != 0:
+            say("systemd did not cooperate.")
+
+        say("Activating Aurora.")
+        say("Relax. If I wanted it, you’d never know.")
+        write("systemctl enable --now aurora.timer")
+        if subprocess.run(["systemctl", "enable", "--now", "aurora.timer"]).returncode != 0:
+            say("Activation failed.")
+
+    say("Good. Everything is running.")
+
+    say("One last thing. Want Aurora available automatically in your terminal? (y/n)")
+
+    valid_responses = ["y", "n"]
+    while True:
+        inpt = input("> ").strip().lower()
+        if inpt in valid_responses:
+            if inpt == "y":
+                bash()
+            break
+        else:
+            say("Focus. It’s a yes or a no.")
+    say("That’s it. I’m in place now. I’ll take it from here—try not to make my job harder.")
+    
+# Fast install
+else:
+    # Deleting old service file
+    if servicePath.exists():
+        for attempt in range(1, MAX_TRIES + 1):
+            try:
+                terminal("deleting old aurora.service file, this might require sudo authentication")
+                subprocess.run(["sudo", "rm", "/etc/systemd/system/aurora.service"])
+                terminal("deleted aurora.service")
+                break
+            except Exception as e:
+                terminal(f"Attempt {attempt} failed: {e}")
+                if attempt == MAX_TRIES:
+                    raise
+    # Deleting old timer files
+    if timerPath.exists():
+        for attempt in range(1, MAX_TRIES + 1):
+            try:
+                terminal("deleting old aurora.timer file, this might require sudo authentication")
+                subprocess.run(["sudo", "rm", "/etc/systemd/system/aurora.timer"])
+                terminal("deleted aurora.timer")
+                break
+            except Exception as e:
+                terminal(f"Attempt {attempt} failed: {e}")
+                if attempt == MAX_TRIES:
+                    raise
+    # Deleting aurora log
+    if logPath.exists():
+        for attempt in range(1, MAX_TRIES + 1):
+            try:
+                terminal("deleting old aurora.log file, this might require sudo authentication")
+                subprocess.run(["sudo", "rm", "/tmp/aurora.log"], check=True)
+                terminal("succesfully deleted aurora.log")
+                break
+            except subprocess.CalledProcessError as e:
+                terminal(f"Attempt {attempt} failed: {e}")
+                if attempt == MAX_TRIES:
+                    raise
+    # Installing service file
+    for attempt in range(1, MAX_TRIES + 1):
+        try:
+            terminal("Installing service file")
+            subprocess.run(
+                ["sudo", "tee", "/etc/systemd/system/aurora.service"],
+                input=service,
+                text=True,
+                stdout=subprocess.DEVNULL,
+                check=True,
+            )
+            terminal("service file sucefsfully installed")
+            break
+        except Exception as e:
+            terminal(f"Installation failed: {e}")
+            if attempt == MAX_TRIES:
+                raise
+    # Installing timer file
+    for attempt in range(1, MAX_TRIES + 1):
+        try:
+            terminal("Installing timer file")
+            subprocess.run(
+                ["sudo", "tee", "/etc/systemd/system/aurora.timer"],
+                input=timer,
+                text=True,
+                stdout=subprocess.DEVNULL,
+                check=True,
+            )
+            terminal("timer file sucefsfully installed")
+            break
+        except Exception as e:
+            terminal(f"Installation failed: {e}")
+            if attempt == MAX_TRIES:
+                raise
+    # Reloading daemon
+    for attempt in range(1, MAX_TRIES + 1):
+        terminal("Reloading daemon services")
+        try:
+            subprocess.run(["systemctl", "daemon-reload"])
+            terminal("Daemon services sucessfully reloaded")
+            break
+        except Exception as e:
+            terminal(f"Failed to reload daemon services: {e}")
+            if attempt == MAX_TRIES:
+                raise
+    # enableing aurora timer
+    for attemt in range(1, MAX_TRIES + 1):
+        terminal("Enableing aurora timer")
+        try:
+            subprocess.run(["systemctl", "enable", "--now", "aurora.timer"])
+            terminal("aurora timer sucessfully enabled")
+            break
+        except Exception as e:
+            terminal(f"Failed to enable aurora timer: {e}")
+            if attempt == MAX_TRIES:
+                raise
+    # Writeing aurora into bashrc file
+    if install_shell_hook:
+        for attempt in range(1, MAX_TRIES + 1):
+            terminal("Adding aurora script to bashrc file")
+            try:
+                bash()
+                terminal("Sucessfully added aurora script to bashrc file")
+                break
+            except Exception as e:
+                terminal(f"Failed to add aurora script to bashrc file: {e}")
+                if attempt == MAX_TRIES:
+                    raise
+    # Running daemon once
+    check_updates()
+    terminal("Instalation complete")
+
+    
+
+

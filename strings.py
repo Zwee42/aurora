@@ -1,5 +1,5 @@
 import getpass
-from config import daemon_timer
+from config import daemon_timer, boot_timer
 
 
 user = getpass.getuser()
@@ -12,10 +12,10 @@ Type=oneshot
 ExecStart=/usr/bin/python /home/{user}/Aurora/daemon.py """
 
 timer = f"""[Unit]
-Description=Run Aurora package counter every 10 minutes
+Description=Run Aurora package counter every {str(daemon_timer)} minutes
 
 [Timer]
-OnBootSec=0s
+OnBootSec={str(boot_timer)}s
 OnUnitActiveSec={str(daemon_timer)}s
 
 [Install]
