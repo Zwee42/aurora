@@ -9,7 +9,7 @@ Description=Aurora daemon service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/python /home/{user}/Aurora/daemon.py """
+ExecStart=/usr/bin/python /home/{user}/Aurora/aurora/daemon.py """
 
 timer = f"""[Unit]
 Description=Run Aurora package counter every {str(daemon_timer)} seconds
