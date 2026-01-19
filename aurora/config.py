@@ -16,6 +16,7 @@
 
 #Let Aurora automatically update your system when packages become critical
 auto_update = True
+ask_update = True
 
 sync_time = 1
 
