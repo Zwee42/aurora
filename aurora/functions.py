@@ -58,3 +58,11 @@ def get_distro_id():
                 k, v = line.rstrip().split("=", 1)
                 distro[k] = v.strip('"')
     return distro.get("ID"), distro.get("ID_LIKE")
+
+def is_arch():
+    return get_distro_id()[0] == "arch"
+
+def is_ubuntu():
+    id_, like = get_distro_id()
+    return id_ == "ubuntu" or (like and "debian" in like)
+
