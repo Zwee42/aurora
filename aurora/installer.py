@@ -134,8 +134,8 @@ if not fast_install:
 
         say("Activating Aurora.")
         say("I’ll need your password once more. Relax, If I wanted it, you’d never know.")
-        write("systemctl enable --now aurora.timer")
-        if subprocess.run(["systemctl", "enable", "--now", "aurora.timer"]).returncode != 0:
+        write("systemctl --user enable --now aurora.timer")
+        if subprocess.run(["systemctl", "--user", "enable", "--now", "aurora.timer"]).returncode != 0:
             say("Activation failed.")
 
     say("Service and timer files are ready. Try to keep up.")
@@ -172,7 +172,7 @@ else:
         for attempt in range(1, MAX_TRIES + 1):
             try:
                 terminal("deleting old aurora.timer file, this might require sudo authentication")
-                subprocess.run(["sudo", "rm", "/etc/systemd/system/aurora.timer"])
+                subprocess.run(["sudo", "rm", timerPath])
                 terminal("deleted aurora.timer")
                 break
             except Exception as e:
@@ -262,7 +262,7 @@ else:
     for attemt in range(1, MAX_TRIES + 1):
         terminal("Enableing aurora timer")
         try:
-            subprocess.run(["systemctl", "enable", "--now", "aurora.timer"])
+            subprocess.run(["systemctl", "--user", "enable", "--now", "aurora.timer"])
             terminal("aurora timer sucessfully enabled")
             break
         except Exception as e:
