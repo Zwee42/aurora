@@ -16,23 +16,23 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import sys
-import os
 sys.path.append("/usr/lib/aurora")
 import responses
 
 import subprocess
 import random
 from rich import print
-import config
+import settings as settings
+
+from config.paths import log_path
 
 
 from daemon import check_updates
 
-from functions import get_distro_id, is_arch, is_ubuntu
+from functions import is_arch, is_ubuntu
 
 
 #---------------- FILE PATHS ----------------
-result_storage_file = "/tmp/aurora.log"
 
 # ---------------- FUNCTIONS ----------------
 def update():
@@ -50,11 +50,11 @@ def update():
 
 def package_count():
     """Print package count with color according to severity."""
-    if updateable_packages < config.normal_threshold:
+    if updateable_packages < settings.normal_threshold:
         color = "green"
-    elif updateable_packages < config.moderate_threshold:
+    elif updateable_packages < settings.moderate_threshold:
         color = "yellow"
-    elif updateable_packages < config.high_threshold:
+    elif updateable_packages < settings.high_threshold:
         color = "red"
     else:
         color = "dark_red"
@@ -67,13 +67,13 @@ def sas_response():
     
     if updateable_packages == 0:
             print("Aurora:", random.choice(responses.stage_0))
-    elif updateable_packages < config.normal_threshold:
+    elif updateable_packages < settings.normal_threshold:
             print("Aurora:", random.choice(responses.stage_1))
-    elif updateable_packages < config.moderate_threshold:
+    elif updateable_packages < settings.moderate_threshold:
             print("Aurora:", random.choice(responses.stage_2))
-    elif updateable_packages < config.high_threshold:
+    elif updateable_packages < settings.high_threshold:
             print("Aurora:", random.choice(responses.stage_3))
-    elif updateable_packages < config.critical_threshold:
+    elif updateable_packages < settings.critical_threshold:
             print("Aurora:", random.choice(responses.stage_4))
     else:
         print("Aurora:", random.choice(responses.stage_5))
@@ -83,11 +83,11 @@ def sas_response():
 def update_handler():
     """Handle user prompts or forced updates based on load and stage."""
     sas_response()
-    if updateable_packages < config.normal_threshold:
+    if updateable_packages < settings.normal_threshold:
         # Minimal load, no update required
         return
 
-    elif updateable_packages < config.high_threshold and config.ask_update:
+    elif updateable_packages < settings.high_threshold and settings.ask_update:
         # Moderate to high load, ask user
         valid_responses = ["y", "n"]
         while True:
@@ -96,17 +96,17 @@ def update_handler():
             if inpt in valid_responses:
                 if inpt == "y":
                     update()
-                    with open(result_storage_file, "w") as f:
+                    with open(log_path, "w") as f:
                         f.write("0")
                 break
             else:
                 print("Aurora:", random.choice(responses.invalid_input_responses))
 
-    elif updateable_packages >= config.high_threshold and config.auto_update:
+    elif updateable_packages >= settings.high_threshold and settings.auto_update:
         # Forced auto-update
         print("Aurora:", random.choice(responses.aurora_auto_update_responses))
         update()
-        with open(result_storage_file, "w") as f:
+        with open(log_path, "w") as f:
             f.write("0")
 
 
@@ -119,8 +119,8 @@ def handle_flags():
         exit(0)
         
     if "--no-update" in sys.argv:
-        config.ask_update = False
-        config.auto_update = False
+        settings.ask_update = False
+        settings.auto_update = False
 
     if "--update" in sys.argv:
         check_updates()
@@ -130,12 +130,12 @@ def handle_flags():
 handle_flags()    
 
 try:
-    with open("/tmp/aurora.log", "r") as f:        
+    with open(log_path, "r") as f:        
         updateable_packages = int(f.read().strip())
 except FileNotFoundError:
     # if the files doesnt exist we create it by updateing it
     subprocess.run(["systemctl", "--user", "start", "aurora.service"])
-    with open("/tmp/aurora.log", "r") as f:        
+    with open(log_path, "r") as f:        
         updateable_packages = int(f.read().strip())
 
 package_count()
