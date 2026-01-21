@@ -6,7 +6,7 @@ from time import sleep
 import random
 from aurora.settings import fast_install, install_shell_hook, DEPENDENCIES
 import platform
-from config.paths import *
+from config.paths import log_path, servicePath, timerPath, pacman_hook_path
 
 
 ### Definitions ###

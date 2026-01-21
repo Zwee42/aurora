@@ -1,6 +1,6 @@
 import subprocess
 from functions import get_distro_id
-from config.paths import *
+from config.paths import log_path
 
 def check_updates():
     id_, id_like = get_distro_id()

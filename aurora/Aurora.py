@@ -16,7 +16,6 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import sys
-import os
 sys.path.append("/usr/lib/aurora")
 import responses
 
@@ -25,12 +24,12 @@ import random
 from rich import print
 import settings as settings
 
-from config.paths import *
+from config.paths import log_path
 
 
 from daemon import check_updates
 
-from functions import get_distro_id, is_arch, is_ubuntu
+from functions import is_arch, is_ubuntu
 
 
 #---------------- FILE PATHS ----------------
