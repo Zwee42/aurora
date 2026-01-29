@@ -9,6 +9,12 @@ from drivers.ubuntu import Ubuntu
 from drivers.arch import Archlinux
 
 
+start = 0.01
+end = 0.04
+small_start = 0.01
+small_end = 0.05
+
+
 
 user = getpass.getuser()
 
@@ -20,14 +26,17 @@ def say(message):
     for i in range(length):
         print(letters[i], end="")
         sys.stdout.flush()
-        sleep(random.uniform(0.05, 0.1))
+        sleep(random.uniform(small_start, small_end))
     print(" ", end="")
     sys.stdout.flush()
-    sleep(random.uniform(0.5, 1))
+    sleep(random.uniform(start, end))
     print("")
 
 def write(message):
-    hostname = Path("/etc/hostname").read_text().strip()
+    try:
+        hostname = Path("/etc/hostname").read_text().strip()
+    except:
+        hostname = "User"
     pwd = Path.cwd()
     print(f"Aurora@{hostname}:{pwd}$", end=" ")
 
@@ -36,10 +45,10 @@ def write(message):
     for i in range(length):
         print(letters[i], end="")
         sys.stdout.flush()
-        sleep(random.uniform(0.05, 0.1))
+        sleep(random.uniform(small_start, small_end))
     print(" ", end="")
     sys.stdout.flush()
-    sleep(random.uniform(0.5, 1))
+    sleep(random.uniform(start, end))
     print("")
 
 
@@ -73,10 +82,3 @@ def get_distro_id():
                 k, v = line.rstrip().split("=", 1)
                 distro[k] = v.strip('"')
     return distro.get("ID"), distro.get("ID_LIKE")
-
-def is_arch():
-    return get_distro_id()[0] == "arch"
-
-def is_ubuntu():
-    id_, like = get_distro_id()
-    return id_ == "ubuntu" or (like and "debian" in like)

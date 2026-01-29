@@ -28,12 +28,7 @@ from rich import print
 import settings as settings
 
 from config.paths import *
-
-
 from daemon import check_updates
-
-from functions import get_distro_id, is_arch, is_ubuntu
-
 
 #---------------- FILE PATHS ----------------
 
