@@ -3,7 +3,7 @@ import subprocess
 
 class Ubuntu(Driver):
     def update():
-        pass
+        subprocess.run(["sudo", "apt", "upgrade"])
 
     def check_updates(self):
         result = subprocess.run(

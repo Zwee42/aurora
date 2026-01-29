@@ -20,6 +20,8 @@ import os
 sys.path.append("/usr/lib/aurora")
 import responses
 
+from functions import get_distro
+
 import subprocess
 import random
 from rich import print
@@ -37,17 +39,9 @@ from functions import get_distro_id, is_arch, is_ubuntu
 
 # ---------------- FUNCTIONS ----------------
 def update():
-    if is_arch():
-        """Run system update via pacman."""
-        subprocess.run(["sudo", "pacman", "-Syu", "--noconfirm"])
-        # after update we check again
-        check_updates()
-    elif is_ubuntu():
-        """Run system update via apt"""
-        subprocess.run(["sudo", "apt", "upgrade"])
-        check_updates()
-    else:
-        raise RuntimeError("Unsupported package manager")
+    distro = get_distro()
+    distro.update()
+    check_updates()
 
 def package_count():
     """Print package count with color according to severity."""
@@ -118,17 +112,17 @@ def handle_flags():
         print("  ","--no-update",4*" ","Prevent aurora from asking to, or, auto updating")
         print("  ","--update",7*" ","Will force check updateable package count")
         exit(0)
-        
+    
     if "--no-update" in sys.argv:
         settings.ask_update = False
         settings.auto_update = False
 
     if "--update" in sys.argv:
         check_updates()
+    
         
-
-# ---------------- MAIN ----------------
-handle_flags()    
+        # ---------------- MAIN ----------------
+        handle_flags()    
 
 try:
     with open(log_path, "r") as f:
@@ -139,6 +133,7 @@ try:
             exit(0)
 except FileNotFoundError:
     # if the files doesnt exist we create it by updateing it
+    check_updates()
     subprocess.run(["systemctl", "--user", "start", "aurora.service"])
     with open(log_path, "r") as f:        
         updateable_packages = int(f.read().strip())

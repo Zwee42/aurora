@@ -3,7 +3,7 @@ import subprocess
 
 class Archlinux(Driver):
     def update():
-        pass
+        subprocess.run(["sudo", "pacman", "-Syu", "--noconfirm"])
 
     def check_updates(self):
         result = subprocess.run(["checkupdates"], capture_output=True, text=True)

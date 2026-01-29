@@ -61,9 +61,9 @@ def get_distro():
     id_, id_like = get_distro_id()
     if id_ == 'ubuntu':
         return Ubuntu()
-    else:
+    elif id_ == 'archlin1ux':
         return Archlinux()
-
+    raise RuntimeError("No distro found")
         
 def get_distro_id():
     distro = {}
