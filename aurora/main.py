@@ -15,22 +15,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+# TO RUN python -m aurora.main
+
 import sys
 import os
 sys.path.append("/usr/lib/aurora")
-import responses
+import aurora.responses as responses
 
-from functions import get_distro
+from aurora.functions import get_distro
 
 import subprocess
 import random
 from rich import print
-import settings as settings
+import aurora.settings as settings
 
-from config.paths import *
-from daemon import check_updates
+from aurora.config.paths import *
+from aurora.daemon import check_updates
 
-#---------------- FILE PATHS ----------------
+updateable_packages = 0
 
 # ---------------- FUNCTIONS ----------------
 def update():
@@ -111,35 +113,43 @@ def handle_flags():
         print("  ","--no-update",4*" ","Prevent aurora from asking to, or, auto updating")
         print("  ","--update",7*" ","Will force check updateable package count")
         exit(0)
-    
+        
     if "--no-update" in sys.argv:
         settings.ask_update = False
         settings.auto_update = False
 
     if "--update" in sys.argv:
-        check_updates()
-    
-        
-        # ---------------- MAIN ----------------
-        handle_flags()    
-
-try:
-    with open(log_path, "r") as f:
         try:
-            updateable_packages = int(f.read().strip())
-        except ValueError:
-            print("Aurora couldn't fetch updateable packages")
-            exit(1)
-except FileNotFoundError:
-    # if the files doesnt exist we create it by updateing it
-    try:
-        updateable_packages = check_updates()
-    except Exception as e:
-        print("Couldn't fetch updates:", e)
-        exit(1)
-    subprocess.run(["systemctl", "--user", "start", "aurora.service"])
-    with open(log_path, "r") as f:        
-        updateable_packages = int(f.read().strip())
+            check_updates()
+        except:
+            print("Couldnt fetch")
 
-package_count()
-update_handler()
+
+def main():
+    global updateable_packages
+    # ---------------- MAIN ----------------
+    handle_flags()    
+    try:
+        with open(log_path, "r") as f:
+            try:
+                updateable_packages = int(f.read().strip())
+            except ValueError:
+                print("Aurora couldn't fetch updateable packages")
+                exit(1)
+    except FileNotFoundError:
+        # if the files doesnt exist we create it by updateing it
+        try:
+            updateable_packages = check_updates()
+        except Exception as e:
+            print("Couldn't fetch updates:", e)
+            exit(1)
+        subprocess.run(["systemctl", "--user", "start", "aurora.service"])
+        with open(log_path, "r") as f:        
+            updateable_packages = int(f.read().strip())
+    
+    package_count()
+    update_handler()
+
+        
+if __name__ == "__main__":
+    main()

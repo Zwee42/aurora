@@ -1,17 +1,19 @@
 import subprocess
-from strings import service, timer, greeting,pacman_hook
-from functions import say, write, terminal, add_to_bashrc, get_distro, get_distro_id
+from aurora.strings import service, timer, greeting,pacman_hook
+from aurora.functions import say, write, terminal, add_to_bashrc, get_distro, get_distro_id
 from pathlib import Path
 from time import sleep
 import random
-from settings import fast_install, install_shell_hook
+from aurora.settings import fast_install, install_shell_hook
 import platform
-from config.paths import *
-
+from aurora.config.paths import *
+import sys
 
 ### Definitions ###
 MAX_TRIES = 3
 
+if "--fast" in sys.argv:
+    fast_install = True
 
 compatible_os = ["linux"]
 compatible_distros = ["arch", "ubuntu"]
