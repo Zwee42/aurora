@@ -12,10 +12,14 @@ def check_updates():
             stderr=subprocess.DEVNULL,
             text=True
         )
-        updateable_packages = str(sum(
-            1 for line in result.stdout.splitlines()
-            if line and not line.startswith("Listing")
-        ))
+        if result.returncode == 0:
+            updateable_packages = str(sum(
+                1 for line in result.stdout.splitlines()
+                if line and not line.startswith("Listing")
+            ))
+        else:
+            updateable_packages = "ERROR"
+
     else:
         result = subprocess.run(["checkupdates"], capture_output=True, text=True)
         if result.returncode == 0:
