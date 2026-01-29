@@ -5,6 +5,8 @@ from pathlib import Path
 from datetime import datetime
 import getpass
 import platform
+from drivers.ubuntu import Ubuntu
+from drivers.arch import Archlinux
 
 
 
@@ -54,6 +56,14 @@ def add_to_bashrc():
     with open(f"/home/{user}/.bashrc", "a") as f:
         f.write("\n# Aurora shell hook\n")
         f.write(f"python {Path.cwd()}/Aurora.py")
+
+def get_distro():
+    id_, id_like = get_distro_id()
+    if id_ == 'ubuntu':
+        return Ubuntu()
+    else:
+        return Archlinux()
+
         
 def get_distro_id():
     distro = {}
