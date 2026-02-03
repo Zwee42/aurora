@@ -76,7 +76,6 @@ class AuroraUpdater:
         
         rprint("\n[bold cyan]━━━ Aurora Update Available ━━━[/bold cyan]")
         rprint(f"[yellow]A new version is available! ({commits_behind} commit{'s' if commits_behind != 1 else ''} behind)[/yellow]")
-        rprint("[cyan]Run 'git pull' to update.[/cyan]")
         rprint("[bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]\n")
 
 
