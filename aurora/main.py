@@ -92,7 +92,7 @@ def update_handler():
             if inpt in valid_responses:
                 if inpt == "y":
                     update()
-                    with open(log_path, "w") as f:
+                    with open(state_path, "w") as f:
                         f.write("0")
                 break
             else:
@@ -102,7 +102,7 @@ def update_handler():
         # Forced auto-update
         print("Aurora:", random.choice(responses.aurora_auto_update_responses))
         update()
-        with open(log_path, "w") as f:
+        with open(state_path, "w") as f:
             f.write("0")
 
 
@@ -130,7 +130,7 @@ def main():
     # ---------------- MAIN ----------------
     handle_flags()    
     try:
-        with open(log_path, "r") as f:
+        with open(state_path, "r") as f:
             try:
                 updateable_packages = int(f.read().strip())
             except ValueError:
@@ -144,7 +144,7 @@ def main():
             print("Couldn't fetch updates:", e)
             exit(1)
         subprocess.run(["systemctl", "--user", "start", "aurora.service"])
-        with open(log_path, "r") as f:        
+        with open(state_path, "r") as f:        
             updateable_packages = int(f.read().strip())
     
     package_count()
