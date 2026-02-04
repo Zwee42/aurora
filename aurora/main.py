@@ -28,7 +28,7 @@ import random
 from rich import print
 import aurora.settings as settings
 
-from aurora.config.paths import *
+from aurora.config.paths import state_path
 from aurora.daemon import check_updates
 
 updateable_packages = 0
@@ -120,7 +120,7 @@ def handle_flags():
     if "--update" in sys.argv:
         try:
             check_updates()
-        except:
+        except OSError:
             print("Couldnt fetch")
 
 
