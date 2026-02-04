@@ -194,11 +194,11 @@ else:
                 if attempt == MAX_TRIES:
                     raise
     # Deleting aurora log
-    if log_path.exists():
+    if state_path.exists():
         for attempt in range(1, MAX_TRIES + 1):
             try:
                 terminal("deleting old aurora.log file, this might require sudo authentication")
-                subprocess.run(["sudo", "rm", log_path], check=True)
+                subprocess.run(["sudo", "rm", state_path], check=True)
                 terminal("succesfully deleted aurora.log")
                 break
             except subprocess.CalledProcessError as e:
