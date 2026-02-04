@@ -8,8 +8,7 @@ dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 service = f"""[Unit]
 Description=Aurora daemon service
-Wants=network-online.target
-After=network-online.target
+After=network.target
 
 [Service]
 Type=oneshot
